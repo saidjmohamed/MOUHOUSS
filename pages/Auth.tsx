@@ -1,7 +1,6 @@
 // pages/Auth.tsx
 import React, { useState } from "react";
-import { signInWithEmailAndPassword, createUserWithEmailAndPassword } from "firebase/auth";
-import { auth } from "../src/firebaseConfig";
+import { supabase } from "../src/supabaseClient";
 
 const Auth = () => {
   const [email, setEmail] = useState("");
@@ -13,9 +12,17 @@ const Auth = () => {
     e.preventDefault();
     try {
       if (isLogin) {
-        await signInWithEmailAndPassword(auth, email, password);
+        const { error } = await supabase.auth.signInWithPassword({
+          email,
+          password,
+        });
+        if (error) throw error;
       } else {
-        await createUserWithEmailAndPassword(auth, email, password);
+        const { error } = await supabase.auth.signUp({
+          email,
+          password,
+        });
+        if (error) throw error;
       }
     } catch (err) {
       setError(err.message);
